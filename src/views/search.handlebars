@@ -140,4 +140,32 @@
             <i class="fas fa-info-circle"></i> Không tìm thấy lịch cúp điện nào phù hợp với tiêu chí tìm kiếm.
         </div>
     {{/if}}
-{{/if}} 
+{{/if}}
+
+<script>
+  // provincePowerCompanies sẽ được render thành object JS
+  const provincePowerCompanies = {{{json provincePowerCompanies}}};
+  const allPowerCompanies = Array.from(document.querySelectorAll('#powerCompany option')).map(opt => opt.value).filter(v => v);
+  const powerCompanySelect = document.getElementById('powerCompany');
+  const provinceSelect = document.getElementById('province');
+
+  provinceSelect.addEventListener('change', function() {
+    const selectedProvince = this.value;
+    // Xóa hết option cũ (trừ option đầu tiên)
+    while (powerCompanySelect.options.length > 1) powerCompanySelect.remove(1);
+    let companies = [];
+    if (selectedProvince && provincePowerCompanies[selectedProvince]) {
+      companies = provincePowerCompanies[selectedProvince];
+    } else {
+      companies = allPowerCompanies;
+    }
+    companies.forEach(name => {
+      if (name && name !== 'Tất cả') {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        powerCompanySelect.appendChild(opt);
+      }
+    });
+  });
+</script> 

@@ -74,6 +74,15 @@ router.get('/', async (req, res) => {
         // Lấy danh sách công ty điện lực duy nhất
         const powerCompanies = await Outage.distinct('powerCompany');
 
+        // Mapping tỉnh thành -> công ty điện lực
+        const provincePowerCompaniesAgg = await Outage.aggregate([
+            { $group: { _id: "$province", companies: { $addToSet: "$powerCompany" } } }
+        ]);
+        const provincePowerCompanies = {};
+        provincePowerCompaniesAgg.forEach(item => {
+            if (item._id) provincePowerCompanies[item._id] = item.companies.filter(Boolean);
+        });
+
         res.render('search', {
             outages,
             provinces: PROVINCES.map(p => p.name),
@@ -81,7 +90,8 @@ router.get('/', async (req, res) => {
             powerCompanies,
             currentPage: page,
             totalPages,
-            pagesToShow
+            pagesToShow,
+            provincePowerCompanies
         });
     } catch (error) {
         console.error('Error searching outages:', error);
