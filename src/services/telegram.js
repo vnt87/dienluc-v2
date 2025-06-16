@@ -2,6 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const Outage = require('../models/outage');
+const TelegramSubscription = require('../models/TelegramSubscription');
 
 const TELEGRAM_API_BASE = 'https://tele.kenhnhacnew.workers.dev/bot';
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -40,12 +41,16 @@ async function sendOutageNotification(outage) {
 
   try {
     const url = `${TELEGRAM_API_BASE}${TELEGRAM_BOT_TOKEN}/sendMessage`;
-    await axios.post(url, {
-      chat_id: TELEGRAM_CHAT_ID,
-      text: message,
-      parse_mode: 'HTML'
-    });
-    console.log('Telegram notification sent successfully');
+    const subscriptions = await TelegramSubscription.find({});
+    const chatIds = subscriptions.map(sub => sub.chatId).filter(Boolean);
+    for (const chatId of chatIds) {
+      await axios.post(url, {
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'HTML'
+      });
+    }
+    console.log(`Telegram notification sent to ${chatIds.length} users`);
   } catch (error) {
     console.error('Error sending Telegram notification:', error.response?.data || error.message);
   }
