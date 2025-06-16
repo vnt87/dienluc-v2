@@ -113,7 +113,7 @@
         {{!-- Prev button --}}
         {{#if (gt currentPage 1)}}
           <li class="page-item">
-            <a class="page-link" href="?{{#each query}}{{@key}}={{this}}&{{/each}}page={{decrement currentPage}}">Prev</a>
+            <a class="page-link" href="?{{#each query}}{{#unless (eq @key 'page')}}{{#if this}}{{@key}}={{this}}&{{/if}}{{/unless}}{{/each}}page={{decrement currentPage}}">Prev</a>
           </li>
         {{/if}}
         {{!-- Page numbers --}}
@@ -123,13 +123,13 @@
           {{else if (eq this '...')}}
             <li class="page-item disabled"><span class="page-link">...</span></li>
           {{else}}
-            <li class="page-item"><a class="page-link" href="?{{#each ../query}}{{@key}}={{this}}&{{/each}}page={{this}}">{{this}}</a></li>
+            <li class="page-item"><a class="page-link" href="?{{#each ../query}}{{#unless (eq @key 'page')}}{{#if this}}{{@key}}={{this}}&{{/if}}{{/unless}}{{/each}}page={{this}}">{{this}}</a></li>
           {{/if}}
         {{/each}}
         {{!-- Next button --}}
         {{#if (lt currentPage totalPages)}}
           <li class="page-item">
-            <a class="page-link" href="?{{#each query}}{{@key}}={{this}}&{{/each}}page={{increment currentPage}}">Next &rsaquo;</a>
+            <a class="page-link" href="?{{#each query}}{{#unless (eq @key 'page')}}{{#if this}}{{@key}}={{this}}&{{/if}}{{/unless}}{{/each}}page={{increment currentPage}}">Next &rsaquo;</a>
           </li>
         {{/if}}
       </ul>
