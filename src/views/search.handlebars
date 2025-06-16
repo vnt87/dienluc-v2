@@ -1,0 +1,143 @@
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-search"></i> Tìm Kiếm Lịch Cúp Điện
+                </h4>
+            </div>
+            <div class="card-body">
+                <form action="/search" method="GET" class="search-box">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="province" class="form-label">Tỉnh/Thành phố</label>
+                                <select class="form-select" id="province" name="province">
+                                    <option value="">Tất cả</option>
+                                    {{#each provinces}}
+                                        <option value="{{this}}" {{#if (eq this ../query.province)}}selected{{/if}}>{{this}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="powerCompany" class="form-label">Công ty Điện lực</label>
+                                <select class="form-select" id="powerCompany" name="powerCompany">
+                                    <option value="">Tất cả</option>
+                                    {{#each powerCompanies}}
+                                        <option value="{{this}}" {{#if (eq this ../query.powerCompany)}}selected{{/if}}>{{this}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label">Từ ngày</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate" value="{{query.startDate}}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label">Đến ngày</label>
+                                <input type="date" class="form-control" id="endDate" name="endDate" value="{{query.endDate}}">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{#if outages.length}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-bolt"></i> Kết Quả Tìm Kiếm
+                    </h4>
+                    <span class="badge bg-primary">{{outages.length}} kết quả</span>
+                </div>
+                <div class="card-body">
+                    {{#each outages}}
+                        <div class="outage-item">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="mb-2">
+                                        <i class="fas fa-map-marker-alt text-danger"></i>
+                                        {{this.province}} - {{this.district}}
+                                    </h5>
+                                    <p class="mb-2">
+                                        <i class="fas fa-building"></i> Khu vực: {{#if (notEmpty this.ward)}}{{this.ward}}{{else}}Không rõ{{/if}}
+                                    </p>
+                                    <p class="mb-2">
+                                        <i class="fas fa-clock"></i> Thời gian: 
+                                        <span class="badge bg-warning">
+                                            {{formatDate this.startTime}} - {{formatDate this.endTime}}
+                                        </span>
+                                    </p>
+                                    <p class="mb-0">
+                                        <i class="fas fa-info-circle"></i> Lý do: {{this.reason}}
+                                    </p>
+                                     <p class="mb-2">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        Trạng thái: {{#if this.status}}{{this.status}}{{else}}Không rõ{{/if}}
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="badge bg-primary mb-2">
+                                        <i class="fas fa-building"></i> {{#if this.powerCompany}}{{this.powerCompany}}{{else}}Không rõ{{/if}}
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock"></i> Cập nhật: {{formatDate this.createdAt}}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        {{!-- Prev button --}}
+        {{#if (gt currentPage 1)}}
+          <li class="page-item">
+            <a class="page-link" href="?{{#each query}}{{@key}}={{this}}&{{/each}}page={{decrement currentPage}}">Prev</a>
+          </li>
+        {{/if}}
+        {{!-- Page numbers --}}
+        {{#each pagesToShow}}
+          {{#if (eq this ../currentPage)}}
+            <li class="page-item active"><span class="page-link">{{this}}</span></li>
+          {{else if (eq this '...')}}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+          {{else}}
+            <li class="page-item"><a class="page-link" href="?{{#each ../query}}{{@key}}={{this}}&{{/each}}page={{this}}">{{this}}</a></li>
+          {{/if}}
+        {{/each}}
+        {{!-- Next button --}}
+        {{#if (lt currentPage totalPages)}}
+          <li class="page-item">
+            <a class="page-link" href="?{{#each query}}{{@key}}={{this}}&{{/each}}page={{increment currentPage}}">Next &rsaquo;</a>
+          </li>
+        {{/if}}
+      </ul>
+    </nav>
+{{else}}
+    {{#if query}}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Không tìm thấy lịch cúp điện nào phù hợp với tiêu chí tìm kiếm.
+        </div>
+    {{/if}}
+{{/if}} 

@@ -1,0 +1,54 @@
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h1 class="text-center">Kết quả tìm kiếm</h1>
+        <p class="text-center text-muted">
+            <% if (query.province) { %>
+                Tỉnh/Thành: <%= query.province %>
+                <% if (query.district) { %>
+                    - Quận/Huyện: <%= query.district %>
+                    <% if (query.ward) { %>
+                        - Phường/Xã: <%= query.ward %>
+                    <% } %>
+                <% } %>
+            <% } %>
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <% if (outages.length === 0) { %>
+            <div class="alert alert-info">
+                Không tìm thấy thông tin cắt điện nào phù hợp với tiêu chí tìm kiếm.
+            </div>
+        <% } else { %>
+            <div class="row">
+                <% outages.forEach(function(outage) { %>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card outage-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title"><%= outage.province %></h5>
+                                <h6 class="card-subtitle mb-2 text-muted"><%= outage.district %></h6>
+                                <p class="card-text">
+                                    <strong>Phường/Xã:</strong> <%= outage.ward %><br>
+                                    <strong>Thời gian:</strong><br>
+                                    <%= outage.startTime.toLocaleString() %> - <%= outage.endTime.toLocaleString() %><br>
+                                    <strong>Lý do:</strong> <%= outage.reason %>
+                                </p>
+                            </div>
+                            <div class="card-footer text-muted">
+                                Cập nhật: <%= outage.createdAt.toLocaleString() %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12 text-center">
+        <a href="/" class="btn btn-primary">Quay lại trang chủ</a>
+    </div>
+</div> 

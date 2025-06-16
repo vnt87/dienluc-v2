@@ -1,0 +1,102 @@
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fab fa-telegram"></i> Đăng Ký Nhận Thông Báo Telegram
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <img src="https://telegram.org/img/t_logo.svg" alt="Telegram Logo" class="img-fluid mb-3" style="max-width: 100px;">
+                    <h5>Nhận thông báo cúp điện qua Telegram</h5>
+                    <p class="text-muted">
+                        Đăng ký để nhận thông báo ngay khi có lịch cúp điện mới tại khu vực của bạn.
+                    </p>
+                </div>
+
+                {{#if error}}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> {{error}}
+                    </div>
+                {{/if}}
+
+                {{#if success}}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> {{success}}
+                    </div>
+                {{/if}}
+
+                <form action="/telegram" method="POST" class="needs-validation" novalidate>
+                    <div class="mb-3">
+                        <label for="chatId" class="form-label">Chat ID Telegram</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fab fa-telegram"></i>
+                            </span>
+                            <input type="text" class="form-control" id="chatId" name="chatId" 
+                                placeholder="Nhập Chat ID của bạn" required>
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle"></i> 
+                            Để lấy Chat ID, hãy chat với <a href="https://t.me/lichcatdien_bot" target="_blank">@lichcatdien_bot</a>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="province" class="form-label">Tỉnh/Thành phố</label>
+                        <select class="form-select" id="province" name="province" required>
+                            <option value="">Chọn tỉnh/thành phố</option>
+                            {{#each provinces}}
+                                <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="powerCompany" class="form-label">Công ty Điện lực</label>
+                        <select class="form-select" id="powerCompany" name="powerCompany">
+                            <option value="">Tất cả</option>
+                            {{#each powerCompanies}}
+                                <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fab fa-telegram"></i> Đăng Ký Nhận Thông Báo
+                    </button>
+                </form>
+
+                <div class="mt-4">
+                    <h5><i class="fas fa-info-circle"></i> Hướng dẫn đăng ký:</h5>
+                    <ol class="list-group list-group-numbered">
+                        <li class="list-group-item">Tìm và chat với bot Telegram của @userinfobot</li>
+                        <li class="list-group-item">Gửi lệnh /start để bắt đầu</li>
+                        <li class="list-group-item">Bot sẽ gửi cho bạn Chat ID</li>
+                        <li class="list-group-item">Nhập Chat ID vào form trên</li>
+                        <li class="list-group-item">Chọn khu vực bạn muốn nhận thông báo</li>
+                        <li class="list-group-item">Nhấn đăng ký và bắt đầu nhận thông báo</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script> 

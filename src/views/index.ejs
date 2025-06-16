@@ -1,0 +1,102 @@
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h1 class="text-center">Lịch Cắt Điện</h1>
+        <p class="text-center text-muted">Cập nhật thông tin cắt điện mới nhất từ các tỉnh thành</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Tìm kiếm nhanh</h5>
+                <form action="/search" method="GET" class="row g-3">
+                    <div class="col-md-4">
+                        <select name="province" class="form-select" id="province">
+                            <option value="">Chọn tỉnh/thành</option>
+                            <% provinces.forEach(function(province) { %>
+                                <option value="<%= province %>"><%= province %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="district" class="form-select" id="district" disabled>
+                            <option value="">Chọn quận/huyện</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="ward" class="form-select" id="ward" disabled>
+                            <option value="">Chọn phường/xã</option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="mb-4">Thông tin cắt điện mới nhất</h2>
+        <div class="row">
+            <% outages.forEach(function(outage) { %>
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card outage-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= outage.province %></h5>
+                            <h6 class="card-subtitle mb-2 text-muted"><%= outage.district %></h6>
+                            <p class="card-text">
+                                <strong>Phường/Xã:</strong> <%= outage.ward %><br>
+                                <strong>Thời gian:</strong><br>
+                                <%= outage.startTime.toLocaleString() %> - <%= outage.endTime.toLocaleString() %><br>
+                                <strong>Lý do:</strong> <%= outage.reason %>
+                            </p>
+                        </div>
+                        <div class="card-footer text-muted">
+                            Cập nhật: <%= outage.createdAt.toLocaleString() %>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('#province').change(function() {
+        const province = $(this).val();
+        if (province) {
+            $.get(`/api/districts/${province}`, function(districts) {
+                $('#district').empty().append('<option value="">Chọn quận/huyện</option>');
+                districts.forEach(function(district) {
+                    $('#district').append(`<option value="${district}">${district}</option>`);
+                });
+                $('#district').prop('disabled', false);
+                $('#ward').prop('disabled', true).empty().append('<option value="">Chọn phường/xã</option>');
+            });
+        } else {
+            $('#district, #ward').prop('disabled', true).empty().append('<option value="">Chọn...</option>');
+        }
+    });
+
+    $('#district').change(function() {
+        const province = $('#province').val();
+        const district = $(this).val();
+        if (district) {
+            $.get(`/api/wards/${province}/${district}`, function(wards) {
+                $('#ward').empty().append('<option value="">Chọn phường/xã</option>');
+                wards.forEach(function(ward) {
+                    $('#ward').append(`<option value="${ward}">${ward}</option>`);
+                });
+                $('#ward').prop('disabled', false);
+            });
+        } else {
+            $('#ward').prop('disabled', true).empty().append('<option value="">Chọn phường/xã</option>');
+        }
+    });
+});
+</script> 
