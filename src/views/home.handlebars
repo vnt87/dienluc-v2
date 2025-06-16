@@ -1,5 +1,6 @@
 <div id="user-province-outages"></div>
 <div id="user-province-pagination" class="my-3"></div>
+<div id="location-alert" class="alert alert-info text-center" style="display:none;"></div>
 <script>
 // Lấy vị trí người dùng và hiển thị lịch cắt điện tỉnh tương ứng ở đầu trang, có phân trang
 window.addEventListener('DOMContentLoaded', function() {
@@ -7,11 +8,24 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentPage = 1;
   let totalPages = 1;
   let limit = 5;
+  const locationAlert = document.getElementById('location-alert');
+
+  function showLocationAlert(msg, type = 'info') {
+    locationAlert.className = `alert alert-${type} text-center`;
+    locationAlert.textContent = msg;
+    locationAlert.style.display = '';
+  }
+
+  function hideLocationAlert() {
+    locationAlert.style.display = 'none';
+  }
+
   function renderOutages(province, page = 1) {
     fetch(`/api/outages?province=${encodeURIComponent(province)}&page=${page}&limit=${limit}`)
       .then(res => res.json())
       .then(data => {
         if (data.outages && data.outages.length > 0) {
+          hideLocationAlert();
           let html = `<div class='card mb-4 bg-dark text-white border-0'><div class='card-header bg-secondary text-white'><b><i class='fas fa-bolt'></i> Lịch cắt điện tại ${province}</b></div><div class='card-body'>`;
           data.outages.forEach(o => {
             html += `<div class='mb-3 p-2 outage-item'>
@@ -65,6 +79,7 @@ window.addEventListener('DOMContentLoaded', function() {
       });
   }
   if (navigator.geolocation) {
+    showLocationAlert('Vui lòng cho phép truy cập vị trí để hiển thị lịch cắt điện tại khu vực của bạn.');
     navigator.geolocation.getCurrentPosition(function(position) {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
@@ -79,9 +94,22 @@ window.addEventListener('DOMContentLoaded', function() {
           if (province) {
             userProvince = province;
             currentPage = 1;
+            showLocationAlert(`Đã xác định vị trí: ${province}`, 'success');
             renderOutages(userProvince, currentPage);
+            setTimeout(hideLocationAlert, 3000);
+          } else {
+            showLocationAlert('Không xác định được tỉnh/thành từ vị trí của bạn.', 'warning');
           }
+        })
+        .catch(() => {
+          showLocationAlert('Không thể xác định vị trí của bạn.', 'warning');
         });
+    }, function(error) {
+      if (error.code === error.PERMISSION_DENIED) {
+        showLocationAlert('Bạn đã từ chối truy cập vị trí. Không thể hiển thị lịch cắt điện theo khu vực.', 'danger');
+      } else {
+        showLocationAlert('Không thể lấy vị trí của bạn.', 'warning');
+      }
     });
   }
 });
