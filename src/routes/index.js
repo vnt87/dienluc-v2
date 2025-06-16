@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
 
         const [outages, total] = await Promise.all([
             Outage.find({ startTime: { $gte: new Date() } })
-                .sort({ startTime: -1 })
+                .sort({ startTime: 1 })
                 .skip(skip)
                 .limit(limit)
                 .lean(),
@@ -115,7 +115,7 @@ router.get('/api/outages', async (req, res) => {
     const total = await Outage.countDocuments(query);
     const totalPages = Math.max(1, Math.ceil(total / limit));
     const outages = await Outage.find(query)
-      .sort({ startTime: -1 })
+      .sort({ startTime: 1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .lean();
